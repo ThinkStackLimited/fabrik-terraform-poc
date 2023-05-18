@@ -1,0 +1,6 @@
+poetry 1.4.2
+python 3.10.11
+terraform 1.4.6
+terragrunt 0.45.13
+pre-commit 3.3.2
+terraform-docs 0.16.0
