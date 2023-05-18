@@ -2,8 +2,6 @@ import logging
 import subprocess
 import sys
 from unittest import mock
-from unittest.mock import call
-from unittest.mock import patch
 
 import pytest
 from yaml.scanner import ScannerError
@@ -29,11 +27,11 @@ def test_validate_args_missing():
 
 def test_validate_args(caplog):
     iac.set_log_level("DEBUG")
-    sys.argv.append("--env=root")
+    sys.argv.append("--environment=poc")
     sys.argv.append("--debug")
     iac.main()
 
-    assert caplog.records[0].msg == 'TG_ENVIRONMENTS - {"root": "{{aws_account_id}}"}'
+    assert caplog.records[0].msg == "TG_ENVIRONMENTS - {}"
     index = 0
     for component in ["resource_groups"]:
         assert caplog.records[index + 1].msg == f"\nProcessing bootstrap: {component}\n"
@@ -48,17 +46,17 @@ def test_validate_args(caplog):
 @mock.patch("subprocess.run")
 def test_iac_no_dry_run(mock_subprocess, caplog):
     iac.set_log_level("DEBUG")
-    sys.argv.append("--env=root")
+    sys.argv.append("--environment=poc")
     iac.main()
 
-    assert caplog.records[0].msg == 'TG_ENVIRONMENTS - {"root": "{{aws_account_id}}"}'
+    assert caplog.records[0].msg == "TG_ENVIRONMENTS - {}"
     assert caplog.records[1].msg == "\nProcessing bootstrap: resource_groups\n"
 
 
 @mock.patch("subprocess.run")
 def test_iac_no_dry_run_exception(mock_subproc_run, caplog):
     iac.set_log_level("DEBUG")
-    sys.argv.append("--env=root")
+    sys.argv.append("--environment=poc")
 
     mock_subproc_run.side_effect = subprocess.CalledProcessError(1, "2")
 
@@ -69,7 +67,7 @@ def test_iac_no_dry_run_exception(mock_subproc_run, caplog):
 @mock.patch("subprocess.run")
 def test_iac_no_dry_run_exception_with_retries(mock_subproc_run, caplog):
     iac.set_log_level("DEBUG")
-    sys.argv.append("--env=root")
+    sys.argv.append("--environment=poc")
     sys.argv.append("--retries=1")
 
     mock_subproc_run.side_effect = subprocess.CalledProcessError(1, "2")
@@ -81,13 +79,13 @@ def test_iac_no_dry_run_exception_with_retries(mock_subproc_run, caplog):
 @mock.patch("subprocess.run")
 def test_iac_apply(mock_subproc_run, caplog):
     iac.set_log_level("DEBUG")
-    sys.argv.append("--env=root")
+    sys.argv.append("--environment=poc")
     sys.argv.append("--debug")
     sys.argv.append("--apply")
 
     iac.main()
 
-    assert caplog.records[0].msg == 'TG_ENVIRONMENTS - {"root": "{{aws_account_id}}"}'
+    assert caplog.records[0].msg == "TG_ENVIRONMENTS - {}"
     assert caplog.records[1].msg == "\nProcessing bootstrap: resource_groups\n"
     assert (
         caplog.records[2].msg
@@ -96,51 +94,15 @@ def test_iac_apply(mock_subproc_run, caplog):
     )
 
 
-def test_invalid_component_root(caplog):
+def test_invalid_component_poc(caplog):
     iac.set_log_level("DEBUG")
-    sys.argv.append("--env=root")
+    sys.argv.append("--environment=poc")
     sys.argv.append("--debug")
     sys.argv.append("--component-root=test")
     iac.main()
 
-    assert caplog.records[0].msg == 'TG_ENVIRONMENTS - {"root": "{{aws_account_id}}"}'
+    assert caplog.records[0].msg == "TG_ENVIRONMENTS - {}"
     assert caplog.records[1].msg == "\nNo component found for test: None\n"
-
-
-@patch("boto3.client")
-def test_role_arn(mock_client, caplog):
-    iac.set_log_level("DEBUG")
-    sys.argv.append("--environment=root")
-    sys.argv.append("--debug")
-    sys.argv.append("--component-root=bootstrap")
-    sys.argv.append("--component=resource_groups")
-    sys.argv.append("--role-arn=arn:aws:iam::123456789012:role/accounts3access")
-    mock_client().assume_role.return_value = {
-        "AssumedRoleUser": {
-            "AssumedRoleId": "AROA3XFRBF535PLBIFPI4:s3-access-example",
-            "Arn": "arn:aws:sts::123456789012:assumed-role/accounts3access/s3-access-example",
-        },
-        "Credentials": {
-            "SecretAccessKey": "9drTJvcXLB89EXAMPLELB8923FB892xMFI",
-            "SessionToken": "AQoXdzELDDY//////////wEaoAK1wvxJY12r2IrDFT2IvAzTCn3zHoZ7YNtpiQLF0MqZye/qwjzP2iEXAMPLEbw"
-            "/m3hsj8VBTkPORGvr9jM5sgP+w9IZWZnU+LWhmg"
-            "+a5fDi2oTGUYcdg9uexQ4mtCHIHfi4citgqZTgco40Yqr4lIlo4V2b2Dyauk0eYFNebHtYlFVgAUj"
-            "+7Indz3LU0aTWk1WKIjHmmMCIoTkyYp/k7kUG7moeEYKSitwQIi6Gjn+nyzM"
-            "+PtoA3685ixzv0R7i5rjQi0YE0lf1oeie3bDiNHncmzosRM6SFiPzSvp6h/32xQuZsjcypmwsPSDtTPYcs0+YN"
-            "/8BRi2/IcrxSpnWEXAMPLEXSDFTAQAM6Dl9zR0tXoybnlrZIwMLlMi1Kcgo5OytwU=",
-            "Expiration": "2016-03-15T00:05:07Z",
-            "AccessKeyId": "ASIAJEXAMPLEXEG2JICEA",
-        },
-    }
-    iac.main()
-    calls = [
-        call("sts"),
-        call().assume_role(
-            RoleArn="arn:aws:iam::123456789012:role/accounts3access",
-            RoleSessionName="TerragruntSession",
-        ),
-    ]
-    mock_client.assert_has_calls(calls, any_order=False)
 
 
 def test_invalid_component_configuration(caplog):

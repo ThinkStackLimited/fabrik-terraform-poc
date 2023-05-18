@@ -1,0 +1,61 @@
+name: CI
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  quality:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3.5.2
+
+      - name: setup python
+        uses: actions/setup-python@v4.6.0
+        with:
+          python-version-file: .python-version
+
+      - name: setup poetry
+        uses: Gr1N/setup-poetry@v8
+        with:
+          poetry-version: 1.4.2
+        if: github.repository != 'ThinkStackLimited/iac-template'
+
+      - name: cache virtualenv
+        uses: actions/cache@v2
+        id: cache-venv
+        with:
+          path: /home/runner/work/fabrik-terraform-poc/fabrik-terraform-poc/.venv
+          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+        if: github.repository != 'ThinkStackLimited/iac-template'
+
+      - name: install dependencies
+        if: steps.cache-venv.outputs.cache-hit != 'true' && github.repository != 'ThinkStackLimited/iac-template'
+        run: make setup
+
+      - name: run tests
+        run: make test
+        if: github.repository != 'ThinkStackLimited/iac-template'
+
+  release:
+    name: semantic updates
+    runs-on: ubuntu-latest
+    concurrency: release
+    needs: [ quality ]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, 'chore(release):')
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3.5.2
+        with:
+          fetch-depth: 0
+      - name: python semantic release
+        uses: relekang/python-semantic-release@master
+        with:
+          git_committer_email: ${{ secrets.GIT_COMMITTER_EMAIL }}
+          git_committer_name: ${{ secrets.GIT_COMMITTER_NAME }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          ssh_private_signing_key: ${{ secrets.SSH_PRIVATE_SIGNING_KEY }}
+          ssh_public_signing_key: ${{ secrets.SSH_PUBLIC_SIGNING_KEY }}
