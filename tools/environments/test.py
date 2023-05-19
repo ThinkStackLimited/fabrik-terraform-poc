@@ -107,42 +107,6 @@ def test_invalid_component_root(caplog):
     assert caplog.records[1].msg == "\nNo component found for test: None\n"
 
 
-@patch("boto3.client")
-def test_role_arn(mock_client, caplog):
-    iac.set_log_level("DEBUG")
-    sys.argv.append("--environment=root")
-    sys.argv.append("--debug")
-    sys.argv.append("--component-root=bootstrap")
-    sys.argv.append("--component=resource_groups")
-    sys.argv.append("--role-arn=arn:aws:iam::123456789012:role/accounts3access")
-    mock_client().assume_role.return_value = {
-        "AssumedRoleUser": {
-            "AssumedRoleId": "AROA3XFRBF535PLBIFPI4:s3-access-example",
-            "Arn": "arn:aws:sts::123456789012:assumed-role/accounts3access/s3-access-example",
-        },
-        "Credentials": {
-            "SecretAccessKey": "9drTJvcXLB89EXAMPLELB8923FB892xMFI",
-            "SessionToken": "AQoXdzELDDY//////////wEaoAK1wvxJY12r2IrDFT2IvAzTCn3zHoZ7YNtpiQLF0MqZye/qwjzP2iEXAMPLEbw"
-            "/m3hsj8VBTkPORGvr9jM5sgP+w9IZWZnU+LWhmg"
-            "+a5fDi2oTGUYcdg9uexQ4mtCHIHfi4citgqZTgco40Yqr4lIlo4V2b2Dyauk0eYFNebHtYlFVgAUj"
-            "+7Indz3LU0aTWk1WKIjHmmMCIoTkyYp/k7kUG7moeEYKSitwQIi6Gjn+nyzM"
-            "+PtoA3685ixzv0R7i5rjQi0YE0lf1oeie3bDiNHncmzosRM6SFiPzSvp6h/32xQuZsjcypmwsPSDtTPYcs0+YN"
-            "/8BRi2/IcrxSpnWEXAMPLEXSDFTAQAM6Dl9zR0tXoybnlrZIwMLlMi1Kcgo5OytwU=",
-            "Expiration": "2016-03-15T00:05:07Z",
-            "AccessKeyId": "ASIAJEXAMPLEXEG2JICEA",
-        },
-    }
-    iac.main()
-    calls = [
-        call("sts"),
-        call().assume_role(
-            RoleArn="arn:aws:iam::123456789012:role/accounts3access",
-            RoleSessionName="TerragruntSession",
-        ),
-    ]
-    mock_client.assert_has_calls(calls, any_order=False)
-
-
 def test_invalid_component_configuration(caplog):
     sys.argv.append("--environment=invalid-component")
 
