@@ -4,7 +4,6 @@ import logging
 import os
 import subprocess
 
-import boto3
 import yaml
 from yaml.scanner import ScannerError
 
@@ -69,13 +68,6 @@ def parse_args():
         type=int,
         help="(optional) Number of times to retry processing each component",
         default=0,
-        required=False,
-    )
-    parser.add_argument(
-        "--role-arn",
-        action="store",
-        dest="role_arn",
-        help="(optional) Provide the arn of an IAM role to assume before running terragrunt",
         required=False,
     )
     args, pass_through_args = parser.parse_known_args()
@@ -160,9 +152,6 @@ def component_builder(cmd_args, config, component_root):
     for component in components:
         logger.info(f"\nProcessing {component_root}: {component}\n")
 
-        if cmd_args.role_arn:
-            assume_iam_role(cmd_args.role_arn)
-
         yaml_to_process = components.get(component)
 
         if not type(yaml_to_process) is dict:
@@ -208,18 +197,6 @@ def process_component(cmd_args, process_args, component, retries=0):
             process_component(cmd_args, process_args, component, retries - 1)
         else:
             exit(1)
-
-
-def assume_iam_role(role_arn):  # pragma: no cover
-    logger.debug(role_arn)
-    sts_client = boto3.client("sts")
-    assumed_role_object = sts_client.assume_role(
-        RoleArn=role_arn, RoleSessionName="TerragruntSession"
-    )
-    credentials = assumed_role_object["Credentials"]
-    os.putenv("AWS_ACCESS_KEY_ID", credentials["AccessKeyId"])
-    os.putenv("AWS_SECRET_ACCESS_KEY", credentials["SecretAccessKey"])
-    os.putenv("AWS_SESSION_TOKEN", credentials["SessionToken"])
 
 
 def construct_run_array(cmd_args, work_dir, *args):
