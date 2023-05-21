@@ -8,8 +8,9 @@ variable "resource_groups" {
   type        = set(string)
   default     = ["bootstrap"]
 }
-#
-#variable "tags" {
-#  description = "Tags to apply to all resources in this module"
-#  type        = map(string)
-#}
+
+variable "tags" {
+  description = "Tags to apply to all resources in this module"
+  type        = map(string)
+  default     = {}
+}
