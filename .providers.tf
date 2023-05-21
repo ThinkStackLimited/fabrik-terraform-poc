@@ -1,17 +1,13 @@
 terraform {
-  required_version = "= 0.14.8"
+  required_version = "= 1.4.6"
   required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 3.0"
-    }
-    archive = {
-      source = "hashicorp/archive"
-      version = "~> 2.1"
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 3.56"
     }
   }
 }
 
-provider aws {
-  region  = "eu-west-2"
+provider "azurerm" {
+  features {}
 }
