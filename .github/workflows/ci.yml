@@ -28,7 +28,7 @@ jobs:
         uses: actions/cache@v2
         id: cache-venv
         with:
-          path: /home/runner/work/iac/iac/.venv
+          path: /home/runner/work/fabrik-terraform-poc/fabrik-terraform-poc/.venv
           key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
         if: github.repository != 'ThinkStackLimited/iac-template'
 
