@@ -41,10 +41,18 @@ jobs:
         if: github.repository != 'ThinkStackLimited/iac-template'
 
   release:
-    name: changelog
+    name: semantic updates
     runs-on: ubuntu-latest
+    concurrency: release
     needs: [ quality ]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, 'chore(release):')
     steps:
       - name: checkout
         uses: actions/checkout@v3.5.2
+        with:
+          fetch-depth: 0
+      - name: python semantic release
+        uses: relekang/python-semantic-release@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          additional_options:
