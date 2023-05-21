@@ -4,7 +4,7 @@ component_roots:
 
 inputs:
   environments:
-    root: "600123456789"
+    root: "123456789012"
 
 core:
   resource_groups: {}
@@ -12,6 +12,6 @@ core:
 valid-env-vars:
   inputs:
     environments:
-      root: "600123456789"
+      root: "123456789012"
     test_true: true
     test_false: false
