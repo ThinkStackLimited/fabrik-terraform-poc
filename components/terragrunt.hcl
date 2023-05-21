@@ -19,7 +19,7 @@ remote_state {
     resource_group_name  = "bootstrap"
     storage_account_name = "fabrikbootstrap"
     container_name       = "terraform-state"
-    key                  = "bootstrap.tfstate"
+    key                  = local.tfstate_key
   }
   generate = {
     path      = "remote_state.tf"
