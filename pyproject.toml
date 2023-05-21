@@ -27,6 +27,8 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.semantic_release]
 branch = "main"
+commit_author = "thinkstack <29373851+thinkstack@users.noreply.github.com>"
+commit_subject = "chore(release): creates new version {version}"
 upload_to_pypi = false
 upload_to_release = false
 upload_to_repository = false
