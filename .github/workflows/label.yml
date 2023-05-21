@@ -3,10 +3,10 @@ on: [pull_request]
 
 jobs:
   label:
-    name: Generate labels
+    name: generate
     runs-on: ubuntu-latest
     steps:
-    - name: Run Labeler
+    - name: run
       uses: actions/labeler@v3
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
