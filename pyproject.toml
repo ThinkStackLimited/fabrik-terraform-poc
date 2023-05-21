@@ -10,17 +10,15 @@ python = "^3.10"
 pyyaml = "^6.0"
 python-terraform = "^0.10.1"
 
-[tool.poetry.dev-dependencies]
-bandit = "*"
-black = "*"
-pytest = "*"
-pytest-black = "*"
-pytest-cov = "*"
-pytest-pycodestyle = "*"
-reorder-python-imports = "*"
-
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.3.2"
+bandit = "^1.7.5"
+black = "^23.3.0"
+pytest = "^7.3.1"
+pytest-black = "^0.3.12"
+pytest-cov = "^4.0.0"
+pytest-pycodestyle = "^2.3.1"
+reorder-python-imports = "^3.9.0"
 
 [build-system]
 requires = ["poetry_core>=1.0.0"]
