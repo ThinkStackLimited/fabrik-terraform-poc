@@ -10,7 +10,7 @@ help: ## The help text you're reading
 	@grep --no-filename -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 apply: ## Apply terraform
-	@poetry run python tools/environments/iac.py --environment ${TG_ENV} --apply
+	@poetry run python tools/environments/iac.py --environment ${TG_ENVIRONMENT} --apply
 
 bandit: ## Run bandit
 	@poetry run bandit -ll ./tools/**/*.py --exclude tools/environments/test.py
@@ -19,10 +19,10 @@ black: ## Run black
 	@poetry run black ./tools/**/*.py
 
 bootstrap_plan: ## Plan the bootstrapping of an environment
-	@poetry run python tools/environments/iac.py --environment ${TG_ENV} --bootstrap
+	@poetry run python tools/environments/iac.py --environment ${TG_ENVIRONMENT} --bootstrap
 
 bootstrap_apply: ## Apply bootstrapping components
-	@poetry run python tools/environments/iac.py --environment ${TG_ENV} --bootstrap --apply
+	@poetry run python tools/environments/iac.py --environment ${TG_ENVIRONMENT} --bootstrap --apply
 
 check: ## Check build requirements
     ifeq ('$(PYTHON_OK)','')
@@ -42,7 +42,7 @@ check: ## Check build requirements
     endif
 
 plan: ## Plan a terraform run
-	@poetry run python tools/environments/iac.py --environment ${TG_ENV}
+	@poetry run python tools/environments/iac.py --environment ${TG_ENVIRONMENT}
 
 reset: ## Teardown tooling
 	rm -rfv .venv
@@ -54,4 +54,4 @@ setup: check ## Setup virtualenv & dependencies using poetry
 	@poetry run pre-commit install
 
 test: bandit black ## Run tests
-	export PYTHONPATH="${PYTHONPATH}:`pwd`/tools/environments" && export TG_ENV=pytest && poetry run pytest -o log_cli=true -vvvv ./tools/environments/test.py
+	export PYTHONPATH="${PYTHONPATH}:`pwd`/tools/environments" && export TG_ENVIRONMENT=pytest && poetry run pytest -o log_cli=true -vvvv ./tools/environments/test.py
