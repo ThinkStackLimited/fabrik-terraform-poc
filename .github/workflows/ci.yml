@@ -10,21 +10,21 @@ jobs:
     name: test
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: checkout
         uses: actions/checkout@v3.5.2
 
-      - name: Setup Python
+      - name: setup python
         uses: actions/setup-python@v4.6.0
         with:
           python-version-file: .python-version
 
-      - name: Setup Poetry
+      - name: setup poetry
         uses: Gr1N/setup-poetry@v8
         with:
           poetry-version: 1.4.2
         if: github.repository != 'ThinkStackLimited/iac-template'
 
-      - name: Cache VirtualEnv
+      - name: cache virtualenv
         uses: actions/cache@v2
         id: cache-venv
         with:
@@ -32,11 +32,11 @@ jobs:
           key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
         if: github.repository != 'ThinkStackLimited/iac-template'
 
-      - name: Install Dependencies
+      - name: install dependencies
         if: steps.cache-venv.outputs.cache-hit != 'true' && github.repository != 'ThinkStackLimited/iac-template'
         run: make setup
 
-      - name: Run tests
+      - name: run tests
         run: make test
         if: github.repository != 'ThinkStackLimited/iac-template'
 
@@ -46,5 +46,5 @@ jobs:
     needs: [ quality ]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, 'chore(release):')
     steps:
-      - name: Checkout
+      - name: checkout
         uses: actions/checkout@v3.5.2
