@@ -1,7 +1,7 @@
 locals {
   environment        = get_env("TG_ENVIRONMENT", "")
   environments       = get_env("TG_ENVIRONMENTS", "{}")
-  github_org         = "thinkstack"
+  github_org         = "ThinkStackLimited"
   terraform_version  = file("../.terraform-version")
   terragrunt_version = file("../.terragrunt-version")
   tfstate_key        = "${path_relative_to_include()}/terraform.tfstate"
