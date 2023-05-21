@@ -2,8 +2,6 @@ import logging
 import subprocess
 import sys
 from unittest import mock
-from unittest.mock import call
-from unittest.mock import patch
 
 import pytest
 from yaml.scanner import ScannerError
@@ -29,11 +27,11 @@ def test_validate_args_missing():
 
 def test_validate_args(caplog):
     iac.set_log_level("DEBUG")
-    sys.argv.append("--env=root")
+    sys.argv.append("--environment=poc")
     sys.argv.append("--debug")
     iac.main()
 
-    assert caplog.records[0].msg == 'TG_ENVIRONMENTS - {"root": "{{aws_account_id}}"}'
+    assert caplog.records[0].msg == "TG_ENVIRONMENTS - {}"
     index = 0
     for component in ["resource_groups"]:
         assert caplog.records[index + 1].msg == f"\nProcessing bootstrap: {component}\n"
@@ -48,17 +46,17 @@ def test_validate_args(caplog):
 @mock.patch("subprocess.run")
 def test_iac_no_dry_run(mock_subprocess, caplog):
     iac.set_log_level("DEBUG")
-    sys.argv.append("--env=root")
+    sys.argv.append("--environment=poc")
     iac.main()
 
-    assert caplog.records[0].msg == 'TG_ENVIRONMENTS - {"root": "{{aws_account_id}}"}'
+    assert caplog.records[0].msg == "TG_ENVIRONMENTS - {}"
     assert caplog.records[1].msg == "\nProcessing bootstrap: resource_groups\n"
 
 
 @mock.patch("subprocess.run")
 def test_iac_no_dry_run_exception(mock_subproc_run, caplog):
     iac.set_log_level("DEBUG")
-    sys.argv.append("--env=root")
+    sys.argv.append("--environment=poc")
 
     mock_subproc_run.side_effect = subprocess.CalledProcessError(1, "2")
 
@@ -69,7 +67,7 @@ def test_iac_no_dry_run_exception(mock_subproc_run, caplog):
 @mock.patch("subprocess.run")
 def test_iac_no_dry_run_exception_with_retries(mock_subproc_run, caplog):
     iac.set_log_level("DEBUG")
-    sys.argv.append("--env=root")
+    sys.argv.append("--environment=poc")
     sys.argv.append("--retries=1")
 
     mock_subproc_run.side_effect = subprocess.CalledProcessError(1, "2")
@@ -81,13 +79,13 @@ def test_iac_no_dry_run_exception_with_retries(mock_subproc_run, caplog):
 @mock.patch("subprocess.run")
 def test_iac_apply(mock_subproc_run, caplog):
     iac.set_log_level("DEBUG")
-    sys.argv.append("--env=root")
+    sys.argv.append("--environment=poc")
     sys.argv.append("--debug")
     sys.argv.append("--apply")
 
     iac.main()
 
-    assert caplog.records[0].msg == 'TG_ENVIRONMENTS - {"root": "{{aws_account_id}}"}'
+    assert caplog.records[0].msg == "TG_ENVIRONMENTS - {}"
     assert caplog.records[1].msg == "\nProcessing bootstrap: resource_groups\n"
     assert (
         caplog.records[2].msg
@@ -96,14 +94,14 @@ def test_iac_apply(mock_subproc_run, caplog):
     )
 
 
-def test_invalid_component_root(caplog):
+def test_invalid_component_poc(caplog):
     iac.set_log_level("DEBUG")
-    sys.argv.append("--env=root")
+    sys.argv.append("--environment=poc")
     sys.argv.append("--debug")
     sys.argv.append("--component-root=test")
     iac.main()
 
-    assert caplog.records[0].msg == 'TG_ENVIRONMENTS - {"root": "{{aws_account_id}}"}'
+    assert caplog.records[0].msg == "TG_ENVIRONMENTS - {}"
     assert caplog.records[1].msg == "\nNo component found for test: None\n"
 
 
