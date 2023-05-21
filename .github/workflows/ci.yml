@@ -54,6 +54,8 @@ jobs:
       - name: python semantic release
         uses: relekang/python-semantic-release@master
         with:
+          git_committer_email: ${{ secrets.GIT_COMMITTER_EMAIL }}
+          git_committer_name: ${{ secrets.GIT_COMMITTER_NAME }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          git_committer_name: "thinkstack"
-          git_committer_email: "29373851+thinkstack@users.noreply.github.com"
+          ssh_private_signing_key: ${{ secrets.SSH_PRIVATE_SIGNING_KEY }}
+          ssh_public_signing_key: ${{ secrets.SSH_PUBLIC_SIGNING_KEY }}
