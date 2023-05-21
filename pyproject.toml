@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fabrik-terraform-poc"
-version = "0.1.0"
+version = "0.0.0"
 description = "Python wrapper for terragrunt"
 readme = "README.md"
 authors = ["Lee Myring <29373851+thinkstack@users.noreply.github.com>"]
